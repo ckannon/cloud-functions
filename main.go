@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cloud-functions/cloudfunctions"
+	"ckannon.com/cloud-functions/cloudfunctions"
 	"cloud.google.com/go/pubsub"
 	"context"
 	"log"
