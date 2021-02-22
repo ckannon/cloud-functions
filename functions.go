@@ -3,7 +3,7 @@ package cloudfunctions
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"log"
@@ -21,15 +21,10 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 		log.Fatal(err)
 	}
 
-	splitData := strings.Split(ParseMessage(m.Data), ",")
-	if len(splitData) < 3 {
-		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
-		return nil
+	project, zone, instance, err := SplitFields(m.Data)
+	if err != nil {
+		log.Printf("Error processsing message: '%s'", m.Data)
 	}
-
-	project := splitData[0]
-	zone := splitData[1]
-	instance := splitData[2]
 
 	resp, err := computeService.Instances.Stop(project, zone, instance).Context(ctx).Do()
 	if err != nil {
@@ -41,10 +36,23 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 	return nil
 }
 
+func SplitFields(data string) (project string, zone string, instance string, error error) {
+	splitData := strings.Split(ParseMessage(data), ",")
+	if len(splitData) < 3 {
+		return "", "", "", errors.New("bad message on PubSub topic")
+	}
+
+	project = splitData[0]
+	zone = splitData[1]
+	instance = splitData[2]
+
+	return project, zone, instance, nil
+}
+
 func ParseMessage(data string) string {
 	decoded, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
-		log.Println(fmt.Sprint("Failed to decode message: '%s'", data))
+		log.Printf("Failed to decode message: '%s'", data)
 	}
 	return string(decoded)
 }
@@ -60,15 +68,10 @@ func ProcessStartMessage(ctx context.Context, m PubSubMessage) error {
 		log.Fatal(err)
 	}
 
-	splitData := strings.Split(ParseMessage(m.Data), ",")
-	if len(splitData) < 3 {
-		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
-		return nil
+	project, zone, instance, err := SplitFields(m.Data)
+	if err != nil {
+		log.Printf("Error processsing message: '%s'", m.Data)
 	}
-
-	project := splitData[0]
-	zone := splitData[1]
-	instance := splitData[2]
 
 	resp, err := computeService.Instances.Start(project, zone, instance).Context(ctx).Do()
 	if err != nil {
