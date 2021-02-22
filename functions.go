@@ -2,6 +2,7 @@ package cloudfunctions
 
 import (
 	"context"
+	"fmt"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"log"
@@ -21,7 +22,7 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 
 	splitData := strings.Split(m.Data, ",")
 	if len(splitData) < 3 {
-		log.Println("Bad message on bus.")
+		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
 		return nil
 	}
 
@@ -52,7 +53,7 @@ func ProcessStartMessage(ctx context.Context, m PubSubMessage) error {
 
 	splitData := strings.Split(m.Data, ",")
 	if len(splitData) < 3 {
-		log.Println("Bad message on bus.")
+		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
 		return nil
 	}
 
