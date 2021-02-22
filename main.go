@@ -3,7 +3,7 @@ package main
 import (
 	"cloud-functions/cloudfunctions"
 	"cloud.google.com/go/pubsub"
-	"golang.org/x/net/context"
+	"context"
 	"log"
 )
 
