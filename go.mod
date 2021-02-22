@@ -1,4 +1,4 @@
-module cloud-functions
+module ckannon.com/cloud-functions
 
 go 1.16
 
