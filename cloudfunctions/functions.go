@@ -39,7 +39,7 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 	return nil
 }
 
-func StartInstance(ctx context.Context, m PubSubMessage) error {
+func ProcessStartMessage(ctx context.Context, m PubSubMessage) error {
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Fatal(err)
