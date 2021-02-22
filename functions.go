@@ -2,6 +2,7 @@ package cloudfunctions
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
@@ -20,7 +21,7 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 		log.Fatal(err)
 	}
 
-	splitData := strings.Split(m.Data, ",")
+	splitData := strings.Split(ParseMessage(m.Data), ",")
 	if len(splitData) < 3 {
 		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
 		return nil
@@ -40,6 +41,14 @@ func ProcessStopMessage(ctx context.Context, m PubSubMessage) error {
 	return nil
 }
 
+func ParseMessage(data string) string {
+	decoded, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		log.Println(fmt.Sprint("Failed to decode message: '%s'", data))
+	}
+	return string(decoded)
+}
+
 func ProcessStartMessage(ctx context.Context, m PubSubMessage) error {
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
@@ -51,7 +60,7 @@ func ProcessStartMessage(ctx context.Context, m PubSubMessage) error {
 		log.Fatal(err)
 	}
 
-	splitData := strings.Split(m.Data, ",")
+	splitData := strings.Split(ParseMessage(m.Data), ",")
 	if len(splitData) < 3 {
 		log.Println(fmt.Sprint("Bad message on bus: '%s'", m.Data))
 		return nil
