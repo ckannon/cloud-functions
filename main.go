@@ -1,7 +1,6 @@
-package main
+package cloudfunctions
 
 import (
-	"ckannon.com/cloudfunctions/cloudfunctions"
 	"cloud.google.com/go/pubsub"
 	"context"
 	"log"
@@ -27,7 +26,7 @@ func main() {
 	}
 
 	err = sub.Receive(context.Background(), func(ctx context.Context, message *pubsub.Message) {
-		m := cloudfunctions.PubSubMessage{Data: string(message.Data)}
-		cloudfunctions.ProcessStopMessage(ctx, m)
+		m := PubSubMessage{Data: string(message.Data)}
+		ProcessStopMessage(ctx, m)
 	})
 }
